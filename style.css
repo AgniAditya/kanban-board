@@ -138,6 +138,7 @@ button{
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 .new-task {
@@ -151,6 +152,7 @@ button{
 
     background-color: var(--bg-primary-color);
     border-radius: var(--border-radius-md);
+    position: relative;
 }
 
 /* Group spacing */
@@ -176,4 +178,20 @@ button{
 
 .btn-add{
     color: #000000;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.close-btn:hover {
+    color: #8b8a8a;
 }

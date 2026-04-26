@@ -1,4 +1,5 @@
 const newTaskBtn = document.querySelector(".new-task-btn");
+const closeTaskBtn = document.querySelector('.close-btn');
 const modal = document.querySelector(".modal");
 const form = document.querySelector(".new-task");
 const todoStage = document.querySelector("#todo-stage")
@@ -29,6 +30,10 @@ let parentColumn = null;
 
 newTaskBtn.addEventListener("click", () => {
     modal.style.display = "flex";
+});
+
+closeTaskBtn.addEventListener('click', () => {
+    document.querySelector('.modal').style.display = 'none';
 });
 
 form.addEventListener("submit", (e) => {
