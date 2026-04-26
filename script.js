@@ -67,7 +67,6 @@ function renderTasks(tasks,stage) {
         task.appendChild(details);
         task.appendChild(deleteWrapper);
 
-        console.dir(stage)
         stageTasks.appendChild(task);
         updateTotalTasks(tasks,stage,1);
     });
