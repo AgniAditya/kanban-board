@@ -43,6 +43,7 @@ form.addEventListener("submit", (e) => {
     const taskDetails = e.target[1].value;
 
     todoTasks.push({
+        index: todoTasks.length - 1,
         name: taskName,
         details: taskDetails
     })
@@ -61,6 +62,7 @@ function renderTasks(tasks,stage) {
         const task = document.createElement("div");
         task.classList.add("task");
         task.setAttribute("draggable","true");
+        task.setAttribute("data-index",`${index}`)
         task.addEventListener("drag", (e) => {
             draggedElement = task;
             parentColumn = stage;
@@ -140,10 +142,12 @@ function addDragAndDropEventsOnColumns(column){
         const taskName = draggedElement.children[0].children[0].textContent;
 
         currentObj.tasks.push({
+            index: currentObj.tasks.length - 1,
             name: taskName,
             details: taskDescription
         })
-        const index = parentObj.tasks.indexOf(draggedElement);
+        
+        const index = draggedElement.dataset.index;
         parentObj.tasks.splice(index,1);
         updateTotalTasks(parentObj.tasks,parentObj.stage,-1);
 
