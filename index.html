@@ -8,63 +8,52 @@
 </head>
 <body>
     <main>
+        <div class="modal">
+            <form class="new-task">
+                <div class="task-name">
+                    <input id="task-name" name="taskName" type="text" placeholder="Task name" required>
+                </div>
+
+                <div class="task-details">
+                    <input id="task-details" name="taskDetails" type="text" placeholder="Task details">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-add">Add</button>
+                </div>
+            </form>
+        </div>
         <section>
             <div class="section-header">
                 <h1>Kanban Board</h1>
-                <button class="add-task-btn"><h3>Add +</h3></button>
+                <button class="new-task-btn"><h3>Add +</h3></button>
             </div>
+
             <div class="stages">
-                <div class="stage">
+                <div  id="todo-stage" class="stage">
                     <div class="stage-header">
                         <h3>To Do</h3>
-                        <h4>1</h4>
+                        <h4><span id="total-todo-tasks">0</span></h4>
                     </div>
-                    <div class="tasks">
-                        <div class="task">
-                            <div class="details">
-                                <h4>Learn JS</h4>
-                                <p>finish it today</p>
-                            </div>
-                            <div class="delete-task">
-                                <button class="delete-task-btn"><h5>Delete</h5></button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="tasks"></div>
                 </div>
-                <div class="stage">
+
+                <div id="inprogress-stage" class="stage">
                     <div class="stage-header">
-                        <h3>In Progess</h3>
-                        <h4>1</h4>
+                        <h3>In Progress</h3>
+                        <h4>0</h4>
                     </div>
-                    <div class="tasks">
-                        <div class="task">
-                            <div class="details">
-                                <h4>DSA</h4>
-                                <p>solve 3 DSA problems</p>
-                            </div>
-                            <div class="delete-task">
-                                <button class="delete-task-btn"><h5>Delete</h5></button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="tasks"></div>
                 </div>
-                <div class="stage">
+
+                <div id="completed-stage" class="stage">
                     <div class="stage-header">
                         <h3>Done</h3>
-                        <h4>1</h4>
+                        <h4>0</h4>
                     </div>
-                    <div class="tasks">
-                        <div class="task">
-                            <div class="details">
-                                <h4>GYM</h4>
-                                <p>legs and abs</p>
-                            </div>
-                            <div class="delete-task">
-                                <button class="delete-task-btn"><h5>Delete</h5></button>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="tasks"></div>
                 </div>
+
             </div>
         </section>
     </main>
