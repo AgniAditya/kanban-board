@@ -5,9 +5,9 @@ const todoStage = document.querySelector("#todo-stage")
 const inprogessStage = document.querySelector("#inprogress-stage")
 const completedStage = document.querySelector("#completed-stage")
 
-let todoTasks = [];
-let inProgessTasks = [];
-let completedTasks = [];
+let todoTasks = [{name: "task1"},{name: "task4"},{name: "task6"}];
+let inProgessTasks = [{name: "task3"},{name: "task5"}];
+let completedTasks = [{name: "task2"}];
 
 newTaskBtn.addEventListener("click", () => {
     modal.style.display = "flex";
@@ -83,3 +83,5 @@ function updateTotalTasks(tasks,stage) {
     const stagetotaltasks = stage.children[0].children[1].children[0];
     stagetotaltasks.textContent = tasks.length;
 }
+
+init();
