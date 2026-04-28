@@ -56,6 +56,7 @@ form.addEventListener("submit", (e) => {
 
 function renderTasks(tasks,stage) {
     const stageTasks = stage.children[1];
+    const currStage = stages.find((s) => s.stage === stage);
     stageTasks.innerHTML = "";
     saveToLocalStorage(tasks,stage);
     tasks.forEach((target,index) => {
@@ -67,6 +68,10 @@ function renderTasks(tasks,stage) {
             draggedElement = task;
             parentColumn = stage;
         })
+
+        if(currStage.stage === todoStage) task.classList.add("todo-tasks");
+        else if(currStage.stage === inprogessStage) task.classList.add("inprogess-tasks");
+        else task.classList.add("completed-tasks")
 
         const details = document.createElement("div");
         details.classList.add("details");

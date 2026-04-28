@@ -119,6 +119,18 @@ button{
     cursor: grabbing;
 }
 
+.todo-tasks{
+    border: 1px solid rgb(243, 50, 50);
+}
+
+.inprogess-tasks{
+    border: 1px solid rgb(242, 242, 69);
+}
+
+.completed-tasks{
+    border: 1px solid rgb(11, 150, 11);
+}
+
 .delete-task{
     display: flex;
     justify-content: end;
