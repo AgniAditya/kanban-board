@@ -1,42 +1,34 @@
 const newTaskBtn = document.querySelector(".new-task-btn");
-const closeTaskBtn = document.querySelector('.close-btn');
+const closeModalBtn = document.querySelector(".close-btn");
 const modal = document.querySelector(".modal");
-const form = document.querySelector(".new-task");
-const todoStage = document.querySelector("#todo-stage")
-const inprogessStage = document.querySelector("#inprogress-stage")
-const completedStage = document.querySelector("#completed-stage")
+const taskForm = document.querySelector(".new-task");
+
+const todoColumn = document.querySelector("#todo-stage");
+const inProgressColumn = document.querySelector("#inprogress-stage");
+const completedColumn = document.querySelector("#completed-stage");
 
 let todoTasks = JSON.parse(localStorage.getItem("to do")) || [];
-let inProgessTasks = JSON.parse(localStorage.getItem("in progress")) || [];
+let inProgressTasks = JSON.parse(localStorage.getItem("in progress")) || [];
 let completedTasks = JSON.parse(localStorage.getItem("done")) || [];
 
-let stages = [
-    {
-        stage: todoStage,
-        tasks: todoTasks
-    },
-    {
-        stage: inprogessStage,
-        tasks: inProgessTasks
-    },
-    {
-        stage: completedStage,
-        tasks: completedTasks
-    }
+const columns = [
+    { element: todoColumn, tasks: todoTasks },
+    { element: inProgressColumn, tasks: inProgressTasks },
+    { element: completedColumn, tasks: completedTasks },
 ];
 
-let draggedElement = null;
-let parentColumn = null;
+let draggedTask = null;
+let sourceColumn = null;
 
 newTaskBtn.addEventListener("click", () => {
     modal.style.display = "flex";
 });
 
-closeTaskBtn.addEventListener('click', () => {
-    document.querySelector('.modal').style.display = 'none';
+closeModalBtn.addEventListener("click", () => {
+    modal.style.display = "none";
 });
 
-form.addEventListener("submit", (e) => {
+taskForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const taskName = e.target[0].value;
@@ -45,120 +37,129 @@ form.addEventListener("submit", (e) => {
     todoTasks.push({
         index: todoTasks.length - 1,
         name: taskName,
-        details: taskDetails
-    })
+        details: taskDetails,
+    });
 
-    renderTasks(todoTasks,todoStage)
+    renderTasks(todoTasks, todoColumn);
 
-    form.reset();
+    taskForm.reset();
     modal.style.display = "none";
 });
 
-function renderTasks(tasks,stage) {
-    const stageTasks = stage.children[1];
-    const currStage = stages.find((s) => s.stage === stage);
-    stageTasks.innerHTML = "";
-    saveToLocalStorage(tasks,stage);
-    tasks.forEach((target,index) => {
-        const task = document.createElement("div");
-        task.classList.add("task");
-        task.setAttribute("draggable","true");
-        task.setAttribute("data-index",`${index}`)
-        task.addEventListener("drag", (e) => {
-            draggedElement = task;
-            parentColumn = stage;
-        })
+function renderTasks(tasks, columnEl) {
+    const taskList = columnEl.children[1];
+    const columnData = columns.find((c) => c.element === columnEl);
 
-        if(currStage.stage === todoStage) task.classList.add("todo-tasks");
-        else if(currStage.stage === inprogessStage) task.classList.add("inprogess-tasks");
-        else task.classList.add("completed-tasks")
+    taskList.innerHTML = "";
+    saveToLocalStorage(tasks, columnEl);
 
-        const details = document.createElement("div");
-        details.classList.add("details");
+    tasks.forEach((taskData, index) => {
+        const taskEl = createTaskElement(taskData, index, tasks, columnEl, columnData);
+        taskList.appendChild(taskEl);
+    });
 
-        const title = document.createElement("h4");
-        title.textContent = target.name;
+    updateTaskCount(tasks, columnEl);
+}
 
-        const description = document.createElement("p");
-        description.textContent = target.details;
+function createTaskElement(taskData, index, tasks, columnEl, columnData) {
+    const taskEl = document.createElement("div");
+    taskEl.classList.add("task");
+    taskEl.setAttribute("draggable", "true");
+    taskEl.setAttribute("data-index", index);
 
-        details.appendChild(title);
-        details.appendChild(description);
+    if (columnData.element === todoColumn) taskEl.classList.add("todo-tasks");
+    else if (columnData.element === inProgressColumn) taskEl.classList.add("inprogress-tasks");
+    else taskEl.classList.add("completed-tasks");
 
-        const deleteWrapper = document.createElement("div");
-        deleteWrapper.classList.add("delete-task");
+    const detailsEl = document.createElement("div");
+    detailsEl.classList.add("details");
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.classList.add("delete-task-btn");
-        deleteBtn.textContent = "Delete";
-        deleteBtn.addEventListener('click', () => {
-            const index = tasks.indexOf(target);
-            tasks.splice(index,1);
-            updateTotalTasks(tasks,stage,-1);
-            renderTasks(tasks,stage);
-        })
+    const titleEl = document.createElement("h4");
+    titleEl.textContent = taskData.name;
 
-        deleteWrapper.appendChild(deleteBtn);
+    const descriptionEl = document.createElement("p");
+    descriptionEl.textContent = taskData.details;
 
-        task.appendChild(details);
-        task.appendChild(deleteWrapper);
+    detailsEl.appendChild(titleEl);
+    detailsEl.appendChild(descriptionEl);
 
-        stageTasks.appendChild(task);
-        updateTotalTasks(tasks,stage,1);
+    const deleteWrapper = document.createElement("div");
+    deleteWrapper.classList.add("delete-task");
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.classList.add("delete-task-btn");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () => {
+        tasks.splice(tasks.indexOf(taskData), 1);
+        renderTasks(tasks, columnEl);
+    });
+
+    deleteWrapper.appendChild(deleteBtn);
+
+    taskEl.addEventListener("drag", () => {
+        draggedTask = taskEl;
+        sourceColumn = columnEl;
+    });
+
+    taskEl.appendChild(detailsEl);
+    taskEl.appendChild(deleteWrapper);
+
+    return taskEl;
+}
+
+function addDragAndDropListeners(columnEl) {
+    columnEl.addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        columnEl.classList.add("hover-over");
+    });
+
+    columnEl.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        columnEl.classList.remove("hover-over");
+    });
+
+    columnEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+    });
+
+    columnEl.addEventListener("drop", (e) => {
+        e.preventDefault();
+        columnEl.classList.remove("hover-over");
+
+        const targetColumnData = columns.find((c) => c.element === columnEl);
+        const sourceColumnData = columns.find((c) => c.element === sourceColumn);
+
+        const taskName = draggedTask.children[0].children[0].textContent;
+        const taskDetails = draggedTask.children[0].children[1].textContent;
+
+        targetColumnData.tasks.push({
+            index: targetColumnData.tasks.length - 1,
+            name: taskName,
+            details: taskDetails,
+        });
+
+        sourceColumnData.tasks.splice(draggedTask.dataset.index, 1);
+
+        renderTasks(targetColumnData.tasks, targetColumnData.element);
+        renderTasks(sourceColumnData.tasks, sourceColumnData.element);
     });
 }
 
-function init(){
-    stages.forEach((stage) => {
-        renderTasks(stage.tasks,stage.stage);
-        addDragAndDropEventsOnColumns(stage.stage)
-    })
+function updateTaskCount(tasks, columnEl) {
+    const countEl = columnEl.children[0].children[1].children[0];
+    countEl.textContent = tasks.length;
 }
 
-function updateTotalTasks(tasks,stage) {
-    const stagetotaltasks = stage.children[0].children[1].children[0];
-    stagetotaltasks.textContent = tasks.length;
+function saveToLocalStorage(tasks, columnEl) {
+    const columnName = columnEl.children[0].children[0].textContent.toLowerCase();
+    localStorage.setItem(columnName, JSON.stringify(tasks));
 }
 
-function saveToLocalStorage(tasks,stage){
-    const stageName = stage.children[0].children[0].textContent.toLowerCase();
-    localStorage.setItem(stageName,JSON.stringify(tasks))
-}
-
-function addDragAndDropEventsOnColumns(column){
-    column.addEventListener("dragenter",(e) => {
-        e.preventDefault()
-        column.classList.add('hover-over')
-    })
-    column.addEventListener("dragleave",(e) => {
-        e.preventDefault()
-        column.classList.remove('hover-over')
-    })
-    column.addEventListener("dragover",(e) => {
-        e.preventDefault();
-    })
-    column.addEventListener("drop",(e) => {
-        e.preventDefault();
-        column.classList.remove('hover-over')
-        const currentObj = stages.find((stageItem) => stageItem.stage === column);
-        const parentObj = stages.find((stageItem) => stageItem.stage === parentColumn);
-
-        const taskDescription = draggedElement.children[0].children[1].textContent;
-        const taskName = draggedElement.children[0].children[0].textContent;
-
-        currentObj.tasks.push({
-            index: currentObj.tasks.length - 1,
-            name: taskName,
-            details: taskDescription
-        })
-        
-        const index = draggedElement.dataset.index;
-        parentObj.tasks.splice(index,1);
-        updateTotalTasks(parentObj.tasks,parentObj.stage,-1);
-
-        renderTasks(currentObj.tasks,currentObj.stage)
-        renderTasks(parentObj.tasks,parentObj.stage)
-    })
+function init() {
+    columns.forEach(({ element, tasks }) => {
+        renderTasks(tasks, element);
+        addDragAndDropListeners(element);
+    });
 }
 
 init();
